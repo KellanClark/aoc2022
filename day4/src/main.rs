@@ -4,7 +4,6 @@ fn main() {
         .map(|line| {
             let split: Vec<&str> = line.split(|c| c == ',' || c == '-').collect();
             let pair: Vec<u32> = split.into_iter().map(|x| x.parse::<u32>().unwrap()).collect();
-            println!("{:?}", pair);
             pair
         }).collect();
 
