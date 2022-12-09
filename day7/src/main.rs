@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-#[derive(Debug)]
 struct Directory {
     size: u64,
     files: HashMap<String, Box<Directory>>,
@@ -23,25 +22,38 @@ fn fill(current_directory: &mut Directory, commands: &mut std::str::Split<'_, &s
                 if command.1 == "..\n" {
                     return;
                 } else {
-                    fill(current_directory.files.entry(command.1.trim().to_string()).or_insert(Box::new(Directory::new())), commands);
+                    fill(
+                        current_directory
+                            .files
+                            .entry(command.1.trim().to_string())
+                            .or_insert(Box::new(Directory::new())),
+                        commands,
+                    );
                 }
             } else if command.0 == "ls" {
                 for line in command.1.lines() {
                     let entry = line.split_once(' ').unwrap();
                     if entry.0 == "dir" {
-                        current_directory.files.insert(entry.1.trim().to_string(), Box::new(Directory::new()));
+                        current_directory
+                            .files
+                            .insert(entry.1.trim().to_string(), Box::new(Directory::new()));
                     } else {
                         current_directory.size += entry.0.parse::<u64>().unwrap();
                     }
                 }
             }
         } else {
-            return
+            return;
         }
     }
 }
 
-fn get_dir_size(current_directory: &mut Directory, answer1: &mut u64, answer2: &mut u64, space_to_free: u64) -> u64 {
+fn get_dir_size(
+    current_directory: &mut Directory,
+    answer1: &mut u64,
+    answer2: &mut u64,
+    space_to_free: u64,
+) -> u64 {
     let mut total_size = current_directory.size;
     for (_name, dir) in &mut current_directory.files {
         total_size += get_dir_size(dir, answer1, answer2, space_to_free);
@@ -69,7 +81,12 @@ fn main() {
     let used_space = get_dir_size(&mut file_tree, &mut answer1, &mut answer2, 0);
     answer1 = 0;
     answer2 = u64::MAX;
-    get_dir_size(&mut file_tree, &mut answer1, &mut answer2, used_space - 40000000);
+    get_dir_size(
+        &mut file_tree,
+        &mut answer1,
+        &mut answer2,
+        used_space - 40000000,
+    );
 
     println!("Part 1: {answer1}");
     println!("Part 2: {answer2}");
