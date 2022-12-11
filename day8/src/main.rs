@@ -66,7 +66,7 @@ fn main() {
                 while height > heights[row][column - left_score] { if (column - left_score) != 0 { left_score += 1; } else { break; } }
                 let mut right_score: usize = 1;
                 while height > heights[row][column + right_score] { if (column + right_score) != (c_size - 1) { right_score += 1; } else { break; } }
-                let score = max(up_score, 1) * max(down_score, 1) * max(left_score, 1) * max(right_score, 1);
+                let score = up_score * down_score * left_score * right_score;
                 if score > answer2 {
                     answer2 = score;
                 }
