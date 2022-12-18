@@ -1,7 +1,3 @@
-
-use std::str::Chars;
-use std::iter::Peekable;
-
 fn compare_chars(left: char, right: char) -> Option<bool> {
     assert!(left != '[' && left != ']' && left != ',');
     assert!(right != '[' && right != ']' && right != ',');
@@ -77,26 +73,57 @@ fn main() {
         let pair = text.split_once('\n').unwrap();
         packets.push(pair.0.chars().collect());
         packets.push(pair.1.chars().collect());
-        //let mut left: Vec<char> = pair.0.chars().collect();
-        //let mut right: Vec<char> = pair.1.chars().collect();//peekable();
     }
 
     let mut answer1 = 0;
     for index in 0..(packets.len() / 2) {
         let mut left_index: usize = 1;
         let mut right_index: usize = 1;
-        let left: &mut Vec<char> = &mut packets[index * 2];
-        let right: &mut Vec<char> = &mut packets[(index * 2) + 1]; // TODO: Not allowed
+        let mut left: Vec<char> = packets[index * 2].clone();
+        let mut right: Vec<char> = packets[(index * 2) + 1].clone();
 
-        if check_list(left, &mut left_index, right, &mut right_index).unwrap() {
+        if check_list(&mut left, &mut left_index, &mut right, &mut right_index).unwrap() {
             answer1 += index + 1;
-            //println!("\nRIGHT\n{text}");
-        } else {
-            //println!("\nWRONG\n{text}");
         }
     }
 
-    //packets.sort_by();
+    // Add dividers
+    packets.push("[[2]]".chars().collect());
+    packets.push("[[6]]".chars().collect());
+
+    // Sort packets
+    for i in 0..packets.len() {
+        for j in 0..packets.len() - i - 1 {
+            let mut left_index: usize = 1;
+            let mut right_index: usize = 1;
+            let mut left: Vec<char> = packets[j].clone();
+            let mut right: Vec<char> = packets[j + 1].clone();
+
+            if !check_list(&mut left, &mut left_index, &mut right, &mut right_index).unwrap() {
+                packets[j] = right;
+                packets[j + 1] = left;
+            }
+        }
+    }
+
+    // Find dividers again
+    let mut divider2: Vec<char> = "[[2]]".chars().collect();
+    let mut divider6: Vec<char> = "[[6]]".chars().collect();
+    let mut answer2 = 1;
+    for i in 0..packets.len() {
+        let mut left_index: usize = 1;
+        let mut right_index: usize = 1;
+        if check_list(&mut divider2, &mut left_index, &mut packets[i], &mut right_index).is_none() {
+            answer2 *= i + 1;
+        }
+
+        left_index = 1;
+        right_index = 1;
+        if check_list(&mut divider6, &mut left_index, &mut packets[i], &mut right_index).is_none() {
+            answer2 *= i + 1;
+        }
+    }
 
     println!("Part 1: {answer1}");
+    println!("Part 2: {answer2}");
 }
